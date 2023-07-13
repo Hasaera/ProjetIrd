@@ -144,30 +144,25 @@ std::string RunInference(const std::vector<float>& data)
 
 void HandlePostRequest(http_request request)
 {
-    utility::string_t content_type = request.headers().content_type();
-    if (content_type == U("application/xml")) // Vérifie le type de contenu
-    {
-        // Récupère le fichier XML depuis le corps de la requête
-        concurrency::streams::istream bodyStream = request.body();
-        std::vector<unsigned char> bodyData;
-        bodyStream.read_to_end(bodyData).wait();
+    concurrency::streams::istream bodyStream = request.body();
+    std::vector<float> data;
 
-        // Traitez le fichier XML selon vos besoins
-        // Exemple de traitement : effectuer l'inférence avec le modèle de neurones
-        std::vector<float> data; // Remplacez par les données réelles du fichier XML
+    // Convert the vector of floats to a streambuf
+    concurrency::streams::streambuf<unsigned char> bodyStreambuf;
+    bodyStream.read_to_end(bodyStreambuf).wait();
 
-        // Effectuer l'inférence avec le modèle de neurones
-        std::string inferenceResult = RunInference(data);
+    // Read the data from the streambuf into the vector of floats
+    auto dataSize = bodyStreambuf.size();
+    data.resize(dataSize / sizeof(float));
+    bodyStreambuf.getn(reinterpret_cast<unsigned char*>(data.data()), dataSize).wait();
 
-        // Renvoyer le résultat de l'inférence en réponse
-        request.reply(status_codes::OK, inferenceResult, U("application/json"));
-    }
-    else
-    {
-        // Type de contenu non pris en charge
-        request.reply(status_codes::UnsupportedMediaType, U("Unsupported Media Type"));
-    }
+    // Perform inference with the neural network model
+    std::string inferenceResult = RunInference(data);
+
+    // Return the inference result as a response
+    request.reply(status_codes::OK, inferenceResult, U("application/json"));
 }
+
 
 int main()
 {
@@ -193,3 +188,5 @@ int main()
 
     return 0;
 }
+
+
