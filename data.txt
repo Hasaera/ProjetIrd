@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<annotation>
+  <object name="cell">
+    <bndbox>
+      <xmin>0</xmin>
+      <ymin>0</ymin>
+      <xmax>1</xmax>
+      <ymax>1</ymax>
+    </bndbox>
+  </object>
+  <object name="cell">
+    <bndbox>
+      <xmin>2</xmin>
+      <ymin>2</ymin>
+      <xmax>3</xmax>
+      <ymax>3</ymax>
+    </bndbox>
+  </object>
+  ...
+</annotation>
